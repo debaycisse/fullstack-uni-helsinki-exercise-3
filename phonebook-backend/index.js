@@ -2,6 +2,8 @@ const express = require('express')
 
 const app = express()
 
+app.use(express.json())
+
 
 let persons = [
     { 
@@ -58,6 +60,26 @@ app.delete('/api/persons/:id', (request, response) => {
     persons = persons.filter(person => person.id !== id)
     response.status(204).send()
 
+})
+
+// Function to obtain a randomly generated id for new person's object
+const genrateId = () => {
+    const maximumRange = persons.length * 100;
+    const id = Math.floor(Math.random() * maximumRange)
+    return id
+}
+// route to handle HTTP POST request type
+app.post('/api/persons', (request, response) => {
+    const body = request.body
+
+    const newPersonObject = {
+        "id": genrateId(),
+        "name": body.name,
+        "number": body.number
+    }
+
+    persons = persons.concat(newPersonObject)
+    response.json(newPersonObject)
 })
 
 const PORT = 3001
