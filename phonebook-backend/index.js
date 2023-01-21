@@ -72,14 +72,29 @@ const genrateId = () => {
 app.post('/api/persons', (request, response) => {
     const body = request.body
 
-    const newPersonObject = {
-        "id": genrateId(),
-        "name": body.name,
-        "number": body.number
-    }
+    const duplicateName = persons.find(person => person.name === body.name)
 
-    persons = persons.concat(newPersonObject)
-    response.json(newPersonObject)
+    if(!body.name || !body.number){
+        const message = {
+            "error": "either name or number is missing"
+        }
+        response.json(message)
+    }else if(duplicateName){
+        const message = {
+            "error": "name must be unique"
+        }
+        response.json(message)
+    }else{
+
+        const newPersonObject = {
+            "id": genrateId(),
+            "name": body.name,
+            "number": body.number
+        }
+    
+        persons = persons.concat(newPersonObject)
+        response.json(newPersonObject)
+    }
 })
 
 const PORT = 3001
