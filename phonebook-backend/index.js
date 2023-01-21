@@ -3,7 +3,7 @@ const express = require('express')
 const app = express()
 
 
-const persons = [
+let persons = [
     { 
       "id": 1,
       "name": "Arto Hellas", 
@@ -26,10 +26,12 @@ const persons = [
     }
 ]
 
+// route to get all persons
 app.get('/api/persons', (request, response) => {
     response.json(persons)
 })
 
+// route to obtain infromation about number of persons and time of this request
 app.get('/info', (request, response) => {
     const numOfEntry = persons.length
     const timeOfRequest = new Date()
@@ -37,6 +39,7 @@ app.get('/info', (request, response) => {
     response.send(message)
 })
 
+// route to obtain a specific person's data
 app.get('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id)
     const person = persons.find(person => person.id === id)
@@ -47,6 +50,13 @@ app.get('/api/persons/:id', (request, response) => {
     }else{
         response.json(person)
     }
+})
+
+// route to respond to HTTP DELETE request type
+app.delete('/api/persons/:id', (request, response) => {
+    const id = Number(request.params.id)
+    persons = persons.filter(person => person.id !== id)
+    response.status(204).send()
 
 })
 
