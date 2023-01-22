@@ -1,24 +1,24 @@
 const express = require('express')
+const morgan = require('morgan')
 
 const app = express()
 
-app.use(express.json())
 
 
 let persons = [
     { 
-      "id": 1,
+        "id": 1,
       "name": "Arto Hellas", 
       "number": "040-123456"
     },
     { 
-      "id": 2,
+        "id": 2,
       "name": "Ada Lovelace", 
       "number": "39-44-5323523"
     },
     { 
-      "id": 3,
-      "name": "Dan Abramov", 
+        "id": 3,
+        "name": "Dan Abramov", 
       "number": "12-43-234345"
     },
     { 
@@ -27,6 +27,11 @@ let persons = [
       "number": "39-23-6423122"
     }
 ]
+
+app.use(express.json())
+app.use(morgan('tiny'))  //tiny, combined, common, dev, short, 
+
+
 
 // route to get all persons
 app.get('/api/persons', (request, response) => {
@@ -85,7 +90,6 @@ app.post('/api/persons', (request, response) => {
         }
         response.json(message)
     }else{
-
         const newPersonObject = {
             "id": genrateId(),
             "name": body.name,
