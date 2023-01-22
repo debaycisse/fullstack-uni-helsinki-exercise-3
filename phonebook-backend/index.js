@@ -1,6 +1,11 @@
 const express = require('express')
 const morgan = require('morgan')
 
+// Customized token format to return request data for HTTP POST request.
+morgan.token('body', function(request, response) {
+    return JSON.stringify(request.body)
+})
+
 const app = express()
 
 
@@ -8,12 +13,12 @@ const app = express()
 let persons = [
     { 
         "id": 1,
-      "name": "Arto Hellas", 
-      "number": "040-123456"
+        "name": "Arto Hellas", 
+        "number": "040-123456"
     },
     { 
         "id": 2,
-      "name": "Ada Lovelace", 
+        "name": "Ada Lovelace", 
       "number": "39-44-5323523"
     },
     { 
@@ -29,14 +34,15 @@ let persons = [
 ]
 
 app.use(express.json())
-app.use(morgan('tiny'))  //tiny, combined, common, dev, short, 
 
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))  // (pre-defined -> tiny, combined, common, dev, short), (cutomized -> body)
 
 
 // route to get all persons
 app.get('/api/persons', (request, response) => {
     response.json(persons)
 })
+
 
 // route to obtain infromation about number of persons and time of this request
 app.get('/info', (request, response) => {
@@ -45,6 +51,7 @@ app.get('/info', (request, response) => {
     const message = `<p>Phonebook has info for ${numOfEntry} people<br/> ${timeOfRequest} </p>`
     response.send(message)
 })
+
 
 // route to obtain a specific person's data
 app.get('/api/persons/:id', (request, response) => {
@@ -59,6 +66,7 @@ app.get('/api/persons/:id', (request, response) => {
     }
 })
 
+
 // route to respond to HTTP DELETE request type
 app.delete('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id)
@@ -67,18 +75,21 @@ app.delete('/api/persons/:id', (request, response) => {
 
 })
 
+
 // Function to obtain a randomly generated id for new person's object
 const genrateId = () => {
     const maximumRange = persons.length * 100;
     const id = Math.floor(Math.random() * maximumRange)
     return id
 }
+
+
 // route to handle HTTP POST request type
 app.post('/api/persons', (request, response) => {
     const body = request.body
 
     const duplicateName = persons.find(person => person.name === body.name)
-
+    
     if(!body.name || !body.number){
         const message = {
             "error": "either name or number is missing"
@@ -101,7 +112,9 @@ app.post('/api/persons', (request, response) => {
     }
 })
 
+
 const PORT = 3001
+
 
 app.listen(PORT, () => {
     console.log('server is running on port ', PORT)
