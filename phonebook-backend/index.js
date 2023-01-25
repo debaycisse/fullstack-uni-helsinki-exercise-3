@@ -6,6 +6,7 @@ morgan.token('body', function(request, response) {
     return JSON.stringify(request.body)
 })
 
+
 const app = express()
 
 
@@ -34,6 +35,8 @@ let persons = [
 ]
 
 app.use(express.json())
+
+app.use(express.static('build'))
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))  // (pre-defined -> tiny, combined, common, dev, short), (cutomized -> body)
 
