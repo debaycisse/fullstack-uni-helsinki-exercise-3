@@ -1,5 +1,9 @@
+require('dotenv').config()
+
+
 const express = require('express')
 const morgan = require('morgan')
+const Person = require('./models/person')
 
 // Customized token format to return request data for HTTP POST request.
 morgan.token('body', function(request, response) {
@@ -48,39 +52,45 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 
 // route to get all persons
 app.get('/api/persons', (request, response) => {
-    response.json(persons)
+    Person.find({}).then(returnedPersonObjects => {
+        response.json(returnedPersonObjects)
+    })
 })
 
 
 // route to obtain infromation about number of persons and time of this request
 app.get('/info', (request, response) => {
-    const numOfEntry = persons.length
-    const timeOfRequest = new Date()
-    const message = `<p>Phonebook has info for ${numOfEntry} people<br/> ${timeOfRequest} </p>`
-    response.send(message)
+    Person.find({}).then(returnedObjects => {
+        const numOfEntry = returnedObjects.length
+        const timeOfRequest = new Date()
+        const message = `<p>Phonebook has info for ${numOfEntry} people<br/> ${timeOfRequest} </p>`
+        response.send(message)
+     })
 })
 
 
 // route to obtain a specific person's data
 app.get('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    const person = persons.find(person => person.id === id)
+    const id = request.params.id
 
-    if(!person){
-        response.statusMessage = 'Requested resource not found'
-        response.status(404).send()
-    }else{
-        response.json(person)
-    }
+    Person.find({_id: id}).then(returnedPerson => {
+        if(!returnedPerson){
+            response.statusMessage = 'Requested resource not found'
+            response.status(404).send()
+        }else{
+            response.json(returnedPerson)
+        }
+    })
+
 })
 
 
 // route to respond to HTTP DELETE request type
 app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    persons = persons.filter(person => person.id !== id)
-    response.status(204).send()
-
+    const id = request.params.id
+    Person.deleteOne({_id:id}).then(result => {
+        response.status(204).send()
+    })
 })
 
 
@@ -96,32 +106,39 @@ const genrateId = () => {
 app.post('/api/persons', (request, response) => {
     const body = request.body
 
-    const duplicateName = persons.find(person => person.name === body.name)
-    
     if(!body.name || !body.number){
         const message = {
             "error": "either name or number is missing"
         }
         response.json(message)
-    }else if(duplicateName){
-        const message = {
-            "error": "name must be unique"
-        }
-        response.json(message)
-    }else{
-        const newPersonObject = {
-            "id": genrateId(),
-            "name": body.name,
-            "number": body.number
-        }
-    
-        persons = persons.concat(newPersonObject)
-        response.json(newPersonObject)
     }
+
+    // const duplicateName = persons.find(person => person.name === body.name)
+    Person.find({name:body.name}).then(result => {
+        
+        if(result){
+            const message = {
+                "error": "name must be unique"
+            }
+            response.json(message)
+        }else{
+            const newPersonObject = {
+                "name": body.name,
+                "number": body.number
+            }
+
+            const person = new Person(newPersonObject)
+            person.save().then(storedPerson => {
+                response.json(storedPerson)
+            })
+        }
+
+    })
+    
 })
 
 
-const PORT = 3001
+const PORT = process.env.PORT
 
 
 app.listen(PORT, () => {
