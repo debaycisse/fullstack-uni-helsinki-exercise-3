@@ -15,33 +15,33 @@ const app = express()
 
 
 
-let persons = [
-    { 
-        "id": 1,
-        "name": "Arto Hellas", 
-        "number": "040-123456"
-    },
-    { 
-        "id": 2,
-        "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-        "id": 3,
-        "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": 4,
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    },
-    {
-        "id": 23,
-        "name": "Azeez Adebayo",
-        "number": "234-817-977-6939"
-    }
-]
+// let persons = [
+//     { 
+//         "id": 1,
+//         "name": "Arto Hellas", 
+//         "number": "040-123456"
+//     },
+//     { 
+//         "id": 2,
+//         "name": "Ada Lovelace", 
+//       "number": "39-44-5323523"
+//     },
+//     { 
+//         "id": 3,
+//         "name": "Dan Abramov", 
+//       "number": "12-43-234345"
+//     },
+//     { 
+//       "id": 4,
+//       "name": "Mary Poppendieck", 
+//       "number": "39-23-6423122"
+//     },
+//     {
+//         "id": 23,
+//         "name": "Azeez Adebayo",
+//         "number": "234-817-977-6939"
+//     }
+// ]
 
 app.use(express.json())
 
@@ -73,8 +73,8 @@ app.get('/info', (request, response) => {
 app.get('/api/persons/:id', (request, response) => {
     const id = request.params.id
 
-    Person.find({_id: id}).then(returnedPerson => {
-        if(!returnedPerson){
+    Person.find({_id:id}).then(returnedPerson => {
+        if(returnedPerson.length < 1){
             response.statusMessage = 'Requested resource not found'
             response.status(404).send()
         }else{
@@ -88,8 +88,19 @@ app.get('/api/persons/:id', (request, response) => {
 // route to respond to HTTP DELETE request type
 app.delete('/api/persons/:id', (request, response) => {
     const id = request.params.id
-    Person.deleteOne({_id:id}).then(result => {
-        response.status(204).send()
+
+    Person.find({_id:id}).then(result => {
+
+        if (result.length < 1){
+            response.json({"error": "resource not found."})
+        }else{
+            Person.deleteOne({_id:result[0].id}).then(resultReturned => {
+                response.status(204).send()
+            }).catch(error => {
+                console.log("Error while deleting person with id ", id, " - ", error.message)
+            })
+        }
+
     })
 })
 
@@ -111,29 +122,32 @@ app.post('/api/persons', (request, response) => {
             "error": "either name or number is missing"
         }
         response.json(message)
+
+    }else {
+        Person.find({name:body.name}).then(result => {
+            
+            // Handle dubplicate entry
+            if(result.length > 0){
+                const message = {
+                    "error": "name must be unique"
+                }
+                response.json(message)
+            }else{
+                const newPersonObject = {
+                    "name": body.name,
+                    "number": body.number
+                }
+    
+                const person = new Person(newPersonObject)
+                person.save().then(storedPerson => {
+                    response.json(storedPerson)
+                })
+            }
+    
+        })
+        
     }
 
-    // const duplicateName = persons.find(person => person.name === body.name)
-    Person.find({name:body.name}).then(result => {
-        
-        if(result){
-            const message = {
-                "error": "name must be unique"
-            }
-            response.json(message)
-        }else{
-            const newPersonObject = {
-                "name": body.name,
-                "number": body.number
-            }
-
-            const person = new Person(newPersonObject)
-            person.save().then(storedPerson => {
-                response.json(storedPerson)
-            })
-        }
-
-    })
     
 })
 
