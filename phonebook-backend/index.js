@@ -124,8 +124,24 @@ app.post('/api/persons', (request, response) => {
         response.json(message)
 
     }else {
-        Person.find({name:body.name}).then(result => {
-            
+
+        // Accept duplicate entries into the phoenbook
+        const newPersonObject = {
+            "name": body.name,
+            "number": body.number
+        }
+
+        const person = new Person(newPersonObject)
+        person.save().then(storedPerson => {
+            response.json(storedPerson)
+        })
+
+
+        /*Person.find({name:body.name}).then(result => {
+
+
+
+
             // Handle dubplicate entry
             if(result.length > 0){
                 const message = {
@@ -144,7 +160,7 @@ app.post('/api/persons', (request, response) => {
                 })
             }
     
-        })
+        })*/
         
     }
 
