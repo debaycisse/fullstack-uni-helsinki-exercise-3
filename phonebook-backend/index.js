@@ -50,7 +50,7 @@ app.use(express.static('build'))
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))  // (pre-defined -> tiny, combined, common, dev, short), (cutomized -> body)
 
 
-// route to get all persons
+// route to handle HTTP GET request type for all persons
 app.get('/api/persons', (request, response) => {
     Person.find({}).then(returnedPersonObjects => {
         response.json(returnedPersonObjects)
@@ -69,7 +69,7 @@ app.get('/info', (request, response) => {
 })
 
 
-// route to obtain a specific person's data
+// route to handle HTTP GET request type for getting a specific person
 app.get('/api/persons/:id', (request, response) => {
     const id = request.params.id
 
@@ -85,7 +85,7 @@ app.get('/api/persons/:id', (request, response) => {
 })
 
 
-// route to respond to HTTP DELETE request type
+// route to handle HTTP DELETE request type
 app.delete('/api/persons/:id', (request, response) => {
     const id = request.params.id
 
