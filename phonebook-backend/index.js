@@ -117,42 +117,36 @@ app.post('/api/persons', (request, response) => {
 
     }else {
 
-        // Accept duplicate entries into the phoenbook
-        const newPersonObject = {
-            "name": body.name,
-            "number": body.number
-        }
-
-        const person = new Person(newPersonObject)
-        person.save().then(storedPerson => {
-            response.json(storedPerson)
-        })
-
-
-        /*Person.find({name:body.name}).then(result => {
-
-
-
+        Person.find({name:body.name}).then(result => {
 
             // Handle dubplicate entry
             if(result.length > 0){
-                const message = {
-                    "error": "name must be unique"
+                // entry must be modified but not new record be created
+                const person = {
+                    name: body.name,
+                    number: body.number
                 }
-                response.json(message)
-            }else{
+                const id = result[0].id
+                Person.findByIdAndUpdate(id, person, {new: true})
+                    .then(updatedPerson => {
+                        response.json(updatedPerson)
+                    })
+                    .catch(error => response.json({"Error Message": error.message}))
+            }
+            else{
                 const newPersonObject = {
                     "name": body.name,
                     "number": body.number
                 }
     
                 const person = new Person(newPersonObject)
-                person.save().then(storedPerson => {
-                    response.json(storedPerson)
-                })
+                person.save()
+                    .then(storedPerson => {
+                        response.json(storedPerson)
+                    })
             }
     
-        })*/
+        })
         
     }
 
