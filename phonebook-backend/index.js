@@ -86,22 +86,14 @@ app.get('/api/persons/:id', (request, response) => {
 
 
 // route to handle HTTP DELETE request type
-app.delete('/api/persons/:id', (request, response) => {
-    const id = request.params.id
+app.delete('/api/persons/:id', (request, response, next) => {
+    
+    Person.findByIdAndRemove(request.params.id)
+        .then(result => {
+            response.status(204).end()
+        })
+        .catch(error => next(error))
 
-    Person.find({_id:id}).then(result => {
-
-        if (result.length < 1){
-            response.json({"error": "resource not found."})
-        }else{
-            Person.deleteOne({_id:result[0].id}).then(resultReturned => {
-                response.status(204).send()
-            }).catch(error => {
-                console.log("Error while deleting person with id ", id, " - ", error.message)
-            })
-        }
-
-    })
 })
 
 
