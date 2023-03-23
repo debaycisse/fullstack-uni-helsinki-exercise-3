@@ -1,7 +1,6 @@
 require('dotenv').config()
-const { response } = require('express')
 const express = require('express')
-const req = require('express/lib/request')
+const cors = require('cors')
 const morgan = require('morgan')
 const Person = require('./models/person')
 
@@ -15,6 +14,7 @@ const app = express()
 
 // Middlewares
 app.use(express.json())
+app.use(cors())
 app.use(express.static('build'))
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))  // (pre-defined -> tiny, combined, common, dev, short), (cutomized -> body)
 
@@ -110,6 +110,8 @@ app.post('/api/persons', (request, response, next) => {
 
 })
 
+
+// route to handle HTTP PUT request type
 app.put('/api/persons/:id', (request, response, next) => {
     const id = request.params.id;
     const body = request.body;
