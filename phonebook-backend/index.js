@@ -1,5 +1,7 @@
 require('dotenv').config()
+const { response } = require('express')
 const express = require('express')
+const req = require('express/lib/request')
 const morgan = require('morgan')
 const Person = require('./models/person')
 
@@ -73,11 +75,11 @@ app.delete('/api/persons/:id', (request, response, next) => {
 
 
 // Function to obtain a randomly generated id for new person's object
-const genrateId = () => {
-    const maximumRange = persons.length * 100;
-    const id = Math.floor(Math.random() * maximumRange)
-    return id
-}
+// const genrateId = () => {
+//     const maximumRange = persons.length * 100;
+//     const id = Math.floor(Math.random() * maximumRange)
+//     return id
+// }
 
 
 // route to handle HTTP POST request type
@@ -88,49 +90,51 @@ app.post('/api/persons', (request, response, next) => {
         const message = {
             "error": "either name or number is missing"
         }
-        response.json(message)
+        response.status(400).json(message)
 
     }else {
 
-        Person
-            .find({name:body.name})
-            .then(result => {
-
-                // Handle dubplicate entry
-                if(result.length > 0){
-                    // entry must be modified but not new record be created
-                    const person = {
-                        name: body.name,
-                        number: body.number
-                    }
-                    
-                    const id = result[0].id
-                    
-                    Person.findByIdAndUpdate(id, person, {new: true})
-                        .then(updatedPerson => {
-                            response.json(updatedPerson)
-                        })
-                        .catch(error => response.json({"Error Message": error.message}))
-                }
-                else{
-                    const newPersonObject = {
-                        "name": body.name,
-                        "number": body.number
-                    }
-        
-                    const person = new Person(newPersonObject)
-                    person.save()
-                        .then(storedPerson => {
-                            response.json(storedPerson)
-                        })
-                }
-        
+        const person = new Person(
+            {
+                "name": body.name,
+                "number": body.number
+            }
+        )
+        person.save()
+        .then(storedPerson => {
+                response.json(storedPerson)
             })
-            .catch(error => next(error))
+        .catch(error => next(error))
         
     }
 
-    
+})
+
+app.put('/api/persons/:id', (request, response, next) => {
+    const id = request.params.id;
+    const body = request.body;
+
+    if(!body.name || !body.number){
+        const message = {
+            "error": "either name or number is missing"
+        }
+        response.status(400).json(message)
+
+    }else {
+        
+        const updatedPerson = {
+            name: body.name,
+            number: body.number
+        }
+
+        Person
+            .findByIdAndUpdate(id, updatedPerson, {new: true})
+            .then(returnedUpdatedPerson => {
+                response.json(returnedUpdatedPerson);
+            })
+            .catch( error => next(error))
+    }
+
 })
 
 const errorHandler = (error, request, response, next) => {
