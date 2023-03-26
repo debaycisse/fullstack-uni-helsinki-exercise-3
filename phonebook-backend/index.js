@@ -116,26 +116,39 @@ app.put('/api/persons/:id', (request, response, next) => {
     const id = request.params.id;
     const body = request.body;
 
-    if(!body.name || !body.number){
-        const message = {
-            "error": "either name or number is missing"
-        }
-        response.status(400).json(message)
 
-    }else {
-        
-        const updatedPerson = {
-            name: body.name,
-            number: body.number
-        }
-
-        Person
-            .findByIdAndUpdate(id, updatedPerson, {new: true})
-            .then(returnedUpdatedPerson => {
-                response.json(returnedUpdatedPerson);
-            })
-            .catch( error => next(error))
+    const updatedPerson = {
+        name: body.name,
+        number: body.number
     }
+
+    Person
+        .findByIdAndUpdate(id, updatedPerson, {new: true, runValidators: true, context: "query"})
+        .then(returnedUpdatedPerson => {
+            response.json(returnedUpdatedPerson);
+        })
+        .catch( error => next(error))
+
+    // if(!body.name || !body.number){
+    //     const message = {
+    //         "error": "either name or number is missing"
+    //     }
+    //     response.status(400).json(message)
+
+    // }else {
+        
+    //     const updatedPerson = {
+    //         name: body.name,
+    //         number: body.number
+    //     }
+
+    //     Person
+    //         .findByIdAndUpdate(id, updatedPerson, {new: true, runValidators: true, context: "query"})
+    //         .then(returnedUpdatedPerson => {
+    //             response.json(returnedUpdatedPerson);
+    //         })
+    //         .catch( error => next(error))
+    // }
 
 })
 
@@ -144,6 +157,8 @@ const errorHandler = (error, request, response, next) => {
 
     if (error.name === "CastError") {
         return response.status(400).send({error: 'Malformed ID, wrong ID value.'})
+    }else if (error.name === "ValidationError"){
+        return response.status(400).json({error: error.message})
     }
 
     next(error)

@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:ui": "rm -r ./build && cd ../../fullstack-uni-helsinki/part2/phonebook/phonebook-app/ && npm run build && cp -r ./build/ ../../../../fullstack-uni-helsinki-exercise-3/phonebook-backend",
+    "deploy": "git add . && git commit -m uiBuild && git push"
   },
   "author": "Azeez Adebayo - debaycisse@gmail.com",
   "license": "MIT",
