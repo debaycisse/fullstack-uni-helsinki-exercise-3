@@ -14,14 +14,24 @@ mongoose.connect(mongoDbUri).then(result => {
     console.log(`Error while connecting to MongoDB - ${error.message}`)
 })
 
+
 const personSchema = mongoose.Schema(
     {
         name: {
             type: String,
             minLength: 3,
-            required: true
+            required: true,
         },
-        number: String
+        number: {
+            type: String,
+            validate: {
+                validator : function(value) {
+                    return /\d{2}-\d{8}/.test(value) || /\d{3}-\d{8}/.test(value);  // regex to match number in format DD-DDDDDDDD or DDD-DDDDDDDD
+                },
+                message: props => `${props.value} is not a valid phone number!`
+            },
+            required: [true, 'User\'s phone number required.']
+        }
     }
 )
 
