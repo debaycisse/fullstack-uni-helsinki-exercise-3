@@ -26,9 +26,9 @@ const personSchema = mongoose.Schema(
             type: String,
             validate: {
                 validator : function(value) {
-                    return /\d{2,3}-\d{4,}/.test(value)  // regex to match number in format DD-DDDDDDDD or DDD-DDDDDDDD
+                    return /\d{2,3}-\d{8}/.test(value)  // regex to match number in format DD-DDDDDDDD or DDD-DDDDDDDD
                 },
-                message: props => `${props.value} is not a valid phone number. Phone number must be in format DDD-DDDDDDDD or DD-DDDDDDDD`
+                message: props => `${props.value} is not a valid phone number. Phone number must be in format 123-12345678 or 12-12345678`
             },
             required: [true, 'User\'s phone number required.']
         }
@@ -55,7 +55,7 @@ module.exports = mongoose.model('Person', personSchema)
 
 /*****************************************************************
  * Logic to direct the execution chain of the application to the
- * appropriate channel
+* appropriate channel
 ******************************************************************/
 // if (process.argv.length < 5) {
 //     // Fetch the data from the DB since name and number are NOT provided

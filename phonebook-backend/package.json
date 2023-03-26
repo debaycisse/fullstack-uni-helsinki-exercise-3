@@ -8,7 +8,7 @@
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:ui": "rm -r ./build && cd ../../fullstack-uni-helsinki/part2/phonebook/phonebook-app/ && npm run build && cp -r ./build/ ../../../../fullstack-uni-helsinki-exercise-3/phonebook-backend",
-    "deploy": "npm run build:ui && git add . && git commit -m uiBuild && git push",
+    "deploy": "npm run build:ui && git add . && git commit -m \"done with exercise 3.22 - lint config\" && git push",
     "lint": "eslint ."
   },
   "author": "Azeez Adebayo - debaycisse@gmail.com",
