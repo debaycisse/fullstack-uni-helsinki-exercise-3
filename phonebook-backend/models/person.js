@@ -1,15 +1,15 @@
 const mongoose = require('mongoose')
 
-/***************************************************************** 
+/*****************************************************************
  * Setup for mongoose
 ******************************************************************/
 mongoose.set('strictQuery', false)
 const mongoDbUri = process.env.MONGODB_URL
 
-console.log("Connecting to MongoDB...")
+console.log('Connecting to MongoDB...')
 
 mongoose.connect(mongoDbUri).then(result => {
-    console.log("Connected to MongoDB.")
+    console.log('Connected to MongoDB.')
 }).catch(error => {
     console.log(`Error while connecting to MongoDB - ${error.message}`)
 })
@@ -26,7 +26,7 @@ const personSchema = mongoose.Schema(
             type: String,
             validate: {
                 validator : function(value) {
-                    return /\d{2,3}-\d{4,}/.test(value);  // regex to match number in format DD-DDDDDDDD or DDD-DDDDDDDD
+                    return /\d{2,3}-\d{4,}/.test(value)  // regex to match number in format DD-DDDDDDDD or DDD-DDDDDDDD
                 },
                 message: props => `${props.value} is not a valid phone number. Phone number must be in format DDD-DDDDDDDD or DD-DDDDDDDD`
             },
@@ -44,7 +44,7 @@ personSchema.set('toJSON', {
 })
 
 
-/***************************************************************** 
+/*****************************************************************
  * Exportation of this module so that external module can use it
 ******************************************************************/
 
@@ -53,8 +53,8 @@ module.exports = mongoose.model('Person', personSchema)
 
 
 
-/***************************************************************** 
- * Logic to direct the execution chain of the application to the 
+/*****************************************************************
+ * Logic to direct the execution chain of the application to the
  * appropriate channel
 ******************************************************************/
 // if (process.argv.length < 5) {

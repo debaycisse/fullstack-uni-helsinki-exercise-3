@@ -24,7 +24,7 @@ app.get('/api/persons', (request, response, next) => {
     Person
         .find({})
         .then(returnedPersonObjects => {
-        response.json(returnedPersonObjects)
+            response.json(returnedPersonObjects)
         })
         .catch(error => next(error))
 })
@@ -49,7 +49,7 @@ app.get('/api/persons/:id', (request, response, next) => {
     const id = request.params.id
 
     Person
-        .find({_id:id})
+        .find({ _id:id })
         .then(returnedPerson => {
             if(returnedPerson.length < 1){
                 response.statusMessage = 'Requested resource not found'
@@ -64,7 +64,7 @@ app.get('/api/persons/:id', (request, response, next) => {
 
 // route to handle HTTP DELETE request type
 app.delete('/api/persons/:id', (request, response, next) => {
-    
+
     Person.findByIdAndRemove(request.params.id)
         .then(result => {
             response.status(204).end()
@@ -88,7 +88,7 @@ app.post('/api/persons', (request, response, next) => {
 
     if(!body.name || !body.number){
         const message = {
-            "error": "either name or number is missing"
+            'error': 'either name or number is missing'
         }
         response.status(400).json(message)
 
@@ -96,16 +96,16 @@ app.post('/api/persons', (request, response, next) => {
 
         const person = new Person(
             {
-                "name": body.name,
-                "number": body.number
+                'name': body.name,
+                'number': body.number
             }
         )
         person.save()
-        .then(storedPerson => {
+            .then(storedPerson => {
                 response.json(storedPerson)
             })
-        .catch(error => next(error))
-        
+            .catch(error => next(error))
+
     }
 
 })
@@ -113,8 +113,8 @@ app.post('/api/persons', (request, response, next) => {
 
 // route to handle HTTP PUT request type
 app.put('/api/persons/:id', (request, response, next) => {
-    const id = request.params.id;
-    const body = request.body;
+    const id = request.params.id
+    const body = request.body
 
 
     const updatedPerson = {
@@ -123,9 +123,9 @@ app.put('/api/persons/:id', (request, response, next) => {
     }
 
     Person
-        .findByIdAndUpdate(id, updatedPerson, {new: true, runValidators: true, context: "query"})
+        .findByIdAndUpdate(id, updatedPerson, { new: true, runValidators: true, context: 'query' })
         .then(returnedUpdatedPerson => {
-            response.json(returnedUpdatedPerson);
+            response.json(returnedUpdatedPerson)
         })
         .catch( error => next(error))
 
@@ -136,7 +136,7 @@ app.put('/api/persons/:id', (request, response, next) => {
     //     response.status(400).json(message)
 
     // }else {
-        
+
     //     const updatedPerson = {
     //         name: body.name,
     //         number: body.number
@@ -155,10 +155,10 @@ app.put('/api/persons/:id', (request, response, next) => {
 const errorHandler = (error, request, response, next) => {
     console.log(`Error Message : ${error.message}`)
 
-    if (error.name === "CastError") {
-        return response.status(400).send({error: 'Malformed ID, wrong ID value.'})
-    }else if (error.name === "ValidationError"){
-        return response.status(400).json({error: error.message})
+    if (error.name === 'CastError') {
+        return response.status(400).send({ error: 'Malformed ID, wrong ID value.' })
+    }else if (error.name === 'ValidationError'){
+        return response.status(400).json({ error: error.message })
     }
 
     next(error)
