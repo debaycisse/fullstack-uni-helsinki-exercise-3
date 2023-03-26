@@ -28,7 +28,7 @@ const personSchema = mongoose.Schema(
                 validator : function(value) {
                     return /\d{2}-\d{8}/.test(value) || /\d{3}-\d{8}/.test(value);  // regex to match number in format DD-DDDDDDDD or DDD-DDDDDDDD
                 },
-                message: props => `${props.value} is not a valid phone number!`
+                message: props => `${props.value} is not a valid phone number. Phone number must in format DDD-DDDDDDDD or DD-DDDDDDDD`
             },
             required: [true, 'User\'s phone number required.']
         }
